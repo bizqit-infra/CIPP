@@ -10,7 +10,7 @@ import { CippPageList } from 'src/components/layout'
 import { ModalService } from 'src/components/utilities'
 import { TitleButton } from 'src/components/buttons'
 
-const GroupTemplates = () => {
+const SpamFilterListTemplates = () => {
   const tenant = useSelector((state) => state.app.currentTenant)
 
   const [ExecuteGetRequest, getResults] = useLazyGenericGetRequestQuery()
@@ -36,13 +36,14 @@ const GroupTemplates = () => {
           color="danger"
           onClick={() =>
             handleDeleteIntuneTemplate(
-              `/api/RemoveGroupTemplate?ID=${row.GUID}`,
+              `/api/RemoveSpamfilterTemplate?ID=${row.GUID}`,
               'Do you want to delete the template?',
             )
           }
         >
           <FontAwesomeIcon icon={faTrash} href="" />
         </CButton>
+
         <CippOffcanvas
           title="Template JSON"
           placement="end"
@@ -59,39 +60,40 @@ const GroupTemplates = () => {
   const columns = [
     {
       name: 'Display Name',
-      selector: (row) => row['Displayname'],
+      selector: (row) => row['name'],
       sortable: true,
-      cell: (row) => CellTip(row['Displayname']),
-      exportSelector: 'Displayname',
-      minWidth: '400px',
-      maxWidth: '400px',
+      cell: (row) => CellTip(row['name']),
+      exportSelector: 'name',
     },
     {
-      name: 'Description',
-      selector: (row) => row['Description'],
+      name: 'High Confidence Spam Action',
+      selector: (row) => row['HighConfidenceSpamAction'],
       sortable: true,
-      cell: (row) => CellTip(row['Description']),
-      exportSelector: 'Description',
-      minWidth: '400px',
-      maxWidth: '400px',
+      exportSelector: 'HighConfidenceSpamAction',
     },
     {
-      name: 'Type',
-      selector: (row) => row['groupType'],
+      name: 'Bulk Spam Action',
+      selector: (row) => row['BulkSpamAction'],
       sortable: true,
-      exportSelector: 'Type',
-      maxWidth: '100px',
+      exportSelector: 'BulkSpamAction',
+    },
+    {
+      name: 'Phish Spam Action',
+      selector: (row) => row['PhishSpamAction'],
+      sortable: true,
+      exportSelector: 'PhishSpamAction',
     },
     {
       name: 'GUID',
       selector: (row) => row['GUID'],
-      omit: true,
+      sortable: true,
+      cell: (row) => CellTip(row['GUID']),
       exportSelector: 'GUID',
     },
     {
       name: 'Actions',
       cell: Offcanvas,
-      maxWidth: '100px',
+      maxWidth: '80px',
     },
   ]
 
@@ -107,34 +109,16 @@ const GroupTemplates = () => {
         <CCallout color="danger">Could not connect to API: {getResults.error.message}</CCallout>
       )}
       <CippPageList
-        title="Group Templates"
-        titleButton={
-          <TitleButton
-            href="/identity/administration/group-add-template"
-            title="Add Group Template"
-          />
-        }
+        title="Spamfilter Templates"
         datatable={{
           reportName: `${tenant?.defaultDomainName}-Groups`,
-          path: '/api/ListGroupTemplates',
+          path: '/api/ListSpamfilterTemplates',
           params: { TenantFilter: tenant?.defaultDomainName },
           columns,
-          tableProps: {
-            selectableRows: true,
-            actionsList: [
-              {
-                label: 'Delete Template',
-                color: 'info',
-                modal: true,
-                modalUrl: `/api/RemoveGroupTemplate?ID=!GUID`,
-                modalMessage: 'Are you sure you want to delete these templates?',
-              },
-            ],
-          },
         }}
       />
     </>
   )
 }
 
-export default GroupTemplates
+export default SpamFilterListTemplates
